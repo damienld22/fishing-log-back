@@ -1,8 +1,10 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
-import router from "./routes";
+import { RegisterRoutes } from "./routes";
+import { MongoClient } from "mongodb";
+import { ShoppingService } from "./services/shopping";
 
 dotenv.config();
 
@@ -13,7 +15,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.static("public"));
 
-app.use(router);
+RegisterRoutes(app);
 
 app.use(
   "/docs",
@@ -25,6 +27,20 @@ app.use(
   })
 );
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+// MongoDB connection
+const mongodbClient = new MongoClient(process.env.MONGODB_URL!);
+
+async function main() {
+  await mongodbClient.connect();
+  console.log("[database] Sucessful connection");
+  const db = mongodbClient.db(process.env.MONGODB_NAME!);
+
+  // Services configuration
+  ShoppingService.setDb(db);
+
+  app.listen(port, () => {
+    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  });
+}
+
+main();
