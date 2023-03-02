@@ -5,6 +5,8 @@ import swaggerUi from "swagger-ui-express";
 import { RegisterRoutes } from "./routes";
 import { MongoClient } from "mongodb";
 import { ShoppingService } from "./services/shopping";
+import { PreparationService } from "./services/preparation";
+import { PlacesService } from "./services/places";
 
 dotenv.config();
 
@@ -37,6 +39,8 @@ async function main() {
 
   // Services configuration
   ShoppingService.setDb(db);
+  PreparationService.setDb(db);
+  PlacesService.setDb(db);
 
   app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
